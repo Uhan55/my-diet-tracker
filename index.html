@@ -12,7 +12,7 @@
         :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; --bg-blur: 25px; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; -webkit-tap-highlight-color: transparent; }
         .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center; background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; }
-        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; box-shadow: 0 -20px 50px rgba(0,0,0,0.3); }
+        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; }
         .drawer.open { bottom: 0; }
         .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 24px; }
         .input-area { width: 100%; height: 110px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 15px; font-size: 14px; outline: none; resize: none; line-height: 1.5; }
@@ -34,14 +34,12 @@
 
     <div class="drawer" id="intakeDrawer">
         <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" onclick="closeDrawer()"></div>
-        
         <div class="flex justify-around mb-6">
             <div onclick="document.getElementById('cameraInput').click()" class="flex flex-col items-center gap-2"><div class="action-icon">📷</div><span class="text-[10px] text-gray-400">相机</span></div>
             <div onclick="document.getElementById('albumInput').click()" class="flex flex-col items-center gap-2"><div class="action-icon">🖼️</div><span class="text-[10px] text-gray-400">相册</span></div>
             <div onclick="toggleVoice()" class="flex flex-col items-center gap-2"><div class="action-icon" id="voiceIcon">🎙️</div><span class="text-[10px] text-gray-400">语音</span></div>
         </div>
-        
-        <textarea class="input-area" id="foodInput" placeholder="输入或录音..."></textarea>
+        <textarea class="input-area" id="foodInput" placeholder="输入饮食内容..."></textarea>
         <button class="analyze-btn" id="analyzeBtn" onclick="triggerAIAnalysis()">🔥 热量分析</button>
         <div id="tagArea" class="flex flex-wrap justify-center mb-4 min-h-[30px]"></div>
         <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold opacity-30" onclick="confirmIntake()" disabled>同步至麻绳</button>
@@ -74,7 +72,7 @@
         function getSafeKey() {
             let key = localStorage.getItem('GEMINI_LAB_KEY');
             if (!key) {
-                key = prompt("请输入您的新 Gemini API Key (已打通网络测试)");
+                key = prompt("请输入有效的 Gemini API Key");
                 if (key) localStorage.setItem('GEMINI_LAB_KEY', key.trim());
             }
             return key;
@@ -90,7 +88,6 @@
         window.openIntake = () => drawer.classList.add('open');
         window.closeDrawer = () => drawer.classList.remove('open');
 
-        // 滑动控制
         let startY;
         window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
         window.addEventListener('touchend', e => {
@@ -103,23 +100,24 @@
             }
         });
 
-        // 核心 AI 调试版
+        // 核心 AI 逻辑：使用 gemini-pro 确保兼容性
         window.triggerAIAnalysis = async () => {
             const KEY = getSafeKey();
             if(!KEY) return;
-            analyzeBtn.innerText = "⚡ 正在握手...";
-            foodInput.value = "正在连接 Google 服务器...";
-
+            analyzeBtn.innerText = "⚡ 正在建立连接...";
+            
             try {
                 const genAI = new GoogleGenerativeAI(KEY);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                // 修改点：切换为 gemini-pro，这是 v1beta 路径下最稳定的文本模型
+                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
                 
-                // 发起请求
-                const result = await model.generateContent("分析食物：" + foodInput.value + "。返回格式：名称\n热量\n建议");
+                const prompt = "你是一个营养专家。请分析以下食物并严格按此格式返回：第一行食物名，第二行卡路里数字（仅数字），第三行一句建议。内容如下：";
+                
+                const result = await model.generateContent(prompt + foodInput.value);
                 const response = await result.response;
                 const text = response.text();
                 
-                const lines = text.split('\n');
+                const lines = text.split('\n').filter(l => l.trim() !== "");
                 tagArea.innerHTML = `<span class="px-3 py-1 bg-green-100 rounded-full text-xs font-bold text-green-700">${lines[0]} | ${lines[1]} kcal</span>`;
                 foodInput.value = text;
                 document.getElementById('confirmBtn').disabled = false;
@@ -127,13 +125,11 @@
                 analyzeBtn.innerText = "🔥 分析成功";
             } catch (err) {
                 console.error(err);
-                // 深度诊断回显
-                foodInput.value = `[DEBUG ERROR REPORT]\nStatus: FAIL\nMessage: ${err.message}\nStack: ${err.stack.split('\n')[0]}\n\n请确认：\n1. VPN是否为'全局模式'\n2. API Key是否在AI Studio中显示为绿色Active`;
+                foodInput.value = `[DEBUG ERROR]\n${err.message}\n\n提示：尝试换成纯文字录入测试。`;
                 analyzeBtn.innerText = "🔥 重试分析";
             }
         };
 
-        // 语音
         let recognition;
         window.toggleVoice = () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -145,12 +141,11 @@
             recognition.start();
         };
 
-        // 同步
         window.confirmIntake = () => {
             const card = document.createElement('div');
             card.className = 'polaroid';
             card.style.left = `${Math.random()*60+10}%`;
-            card.innerHTML = `<div class='h-16 bg-gray-100 flex items-center justify-center text-xl'>🍱</div><p class='text-[8px] text-center mt-1'>${foodInput.value.split('\n')[0]}</p>`;
+            card.innerHTML = `<div class='h-16 bg-gray-100 flex items-center justify-center text-xl'>🥗</div><p class='text-[8px] text-center mt-1'>${foodInput.value.split('\n')[0]}</p>`;
             document.getElementById('ropeContainer').appendChild(card);
             closeDrawer();
         };
