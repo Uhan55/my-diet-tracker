@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 营养师原型</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #4CAF50; --bg: #f5f7fa; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
+        .circle-box { position: relative; width: 120px; height: 120px; margin: 0 auto 10px; border: 8px solid #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; border-top-color: var(--primary); }
+        .ingredient { text-align: left; margin: 15px 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        input[type=range] { width: 100%; accent-color: var(--primary); }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="circle-box">
+            <div style="font-size: 24px; font-weight: bold;" id="totalCal">0</div>
+            <div style="font-size: 12px; color: #888;">今日已摄入</div>
+        </div>
+        <p style="font-size: 14px; color: #666;">目标配额: 2000 kcal</p>
+    </div>
+
+    <div class="card">
+        <h3 style="text-align: left; margin-top: 0;">🥗 AI 识别出的午餐</h3>
+        
+        <div class="ingredient">
+            <div class="info"><span>🍚 米饭</span><span id="label1">200g</span></div>
+            <input type="range" id="slider1" min="0" max="500" value="200" oninput="update()">
+        </div>
+
+        <div class="ingredient">
+            <div class="info"><span>🍗 煎鸡胸肉</span><span id="label2">150g</span></div>
+            <input type="range" id="slider2" min="0" max="500" value="150" oninput="update()">
+        </div>
+
+        <button class="btn" onclick="alert('数据已同步至 Supabase 数据库')">确认保存</button>
+    </div>
+
+    <div class="card">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        function update() {
+            const s1 = document.getElementById('slider1').value;
+            const s2 = document.getElementById('slider2').value;
+            
+            document.getElementById('label1').innerText = s1 + 'g';
+            document.getElementById('label2').innerText = s2 + 'g';
+            
+            // 简单估算：米饭1.16大卡/g，鸡肉1.65大卡/g
+            const total = Math.round(s1 * 1.16 + s2 * 1.65);
+            document.getElementById('totalCal').innerText = total;
+        }
+
+        // 初始化图表
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['周一', '周二', '周三', '周四', '今日'],
+                datasets: [
+                    { label: '摄入', data: [1800, 2200, 1900, 2050, 650], borderColor: '#4CAF50', tension: 0.3 },
+                    { label: '消耗', data: [2100, 1800, 2300, 1900, 400], borderColor: '#2196F3', tension: 0.3 }
+                ]
+            }
+        });
+        
+        update(); // 初始计算一次
+    </script>
+</body>
+</html>
