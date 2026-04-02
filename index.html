@@ -34,34 +34,141 @@
 
         /* 多模态功能条 */
         .media-actions { display: flex; justify-content: space-around; margin-bottom: 25px; }
-        .action-item {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            cursor: pointer; transition: 0.2s;
-        }
+        .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
         .action-item:active { transform: scale(0.9); }
-        .action-icon {
-            width: 55px; height: 55px; border-radius: 18px;
-            background: #f0f0f0; display: flex; justify-content: center; align-items: center;
-            font-size: 24px; color: #444;
-        }
+        .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 24px; }
 
-        .input-area {
-            width: 100%; height: 120px; border: 1.5px solid #eee; background: #fafafa;
-            border-radius: 20px; padding: 18px; font-size: 16px; outline: none; resize: none; margin-bottom: 20px;
-        }
+        .input-area { width: 100%; height: 120px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 18px; font-size: 16px; outline: none; resize: none; margin-bottom: 20px; }
 
         /* 主容器 */
         .main-container { height: 300vh; transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-        /* 时间标题区 - 向上挪并优化 */
-        .header-info { position: absolute; top: 15%; text-align: center; pointer-events: none; }
-        .date-card {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-            padding: 15px 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.15);
+        /* 时间标题区 */
+        .header-info { position: absolute; top: 12%; text-align: center; width: 100%; }
+        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 15px 35px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.15); }
+
+        /* 控制按钮 */
+        .control-panel { display: flex; gap: 40px; margin-top: 80px; }
+        .btn-circle { width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.2); }
+        .btn-plus { background: var(--sage-green); }
+        .btn-minus { background: var(--dusty-blue); }
+
+        /* 麻绳轴 */
+        .rope-container { width: 100%; height: 3px; background: #6b5344; position: absolute; top: 50%; }
+        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; transform-origin: top center; animation: swing 4s ease-in-out infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+        @keyframes swing { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="background-layer" id="bg"></div>
+
+    <div class="drawer" id="intakeDrawer">
+        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 cursor-pointer" onclick="closeDrawer()"></div>
+        <h3 class="text-xl font-bold mb-8 text-center text-gray-800">🔬 采集能量样本</h3>
+        
+        <div class="media-actions">
+            <div class="action-item" onclick="alert('调起系统相机')"><div class="action-icon">📷</div><span class="text-xs text-gray-500">拍照</span></div>
+            <div class="action-item" onclick="alert('打开手机相册')"><div class="action-icon">🖼️</div><span class="text-xs text-gray-500">相册</span></div>
+            <div class="action-item" onclick="startVoiceSim()"><div class="action-icon" id="micIcon">🎙️</div><span class="text-xs text-gray-500">语音</span></div>
+        </div>
+        
+        <textarea class="input-area" id="foodInput" placeholder="描述你的饮食..."></textarea>
+        <div id="tagArea" class="flex flex-wrap justify-center mb-10 min-h-[40px]"></div>
+        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all" onclick="confirmIntake()">同步至实验室麻绳</button>
+    </div>
+
+    <div class="main-container" id="main">
+        <div class="section">
+            <div class="rope-container">
+                <div class="polaroid" style="left: 20%;" onclick="pullRope(this)">
+                    <div class="w-full h-[75px] bg-gray-100 flex items-center justify-center">🥗</div>
+                    <p class="text-[10px] mt-2 text-center text-gray-600">Sample-01</p>
+                </div>
+            </div>
+            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动返回主控</div>
+        </div>
+
+        <div class="section">
+            <div class="header-info">
+                <div class="date-card">
+                    <h2 class="text-white text-4xl font-light tracking-widest">TODAY</h2>
+                    <p class="text-white opacity-60 text-sm mt-1 uppercase">Thursday • April 2nd</p>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <div class="btn-circle btn-plus" onclick="openIntake()">
+                    <span class="text-4xl font-light">+</span>
+                    <span class="text-[11px] mt-2 uppercase">Intake</span>
+                </div>
+                <div class="btn-circle btn-minus" onclick="alert('Burn抽屉开发中')">
+                    <span class="text-4xl font-light">−</span>
+                    <span class="text-[11px] mt-2 uppercase">Burn</span>
+                </div>
+            </div>
+            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动看数据分析</div>
+        </div>
+
+        <div class="section">
+            <div class="w-[85%] h-[60%] bg-white/95 backdrop-blur-xl rounded-[40px] p-8 shadow-2xl">
+                <h3 class="font-bold text-gray-800 text-lg mb-8">Weekly Balance</h3>
+                <div class="flex justify-around items-end h-40 border-b border-gray-100 pb-4">
+                    <div class="w-8 bg-[#B2AC88] h-32 rounded-t-xl"></div>
+                    <div class="w-8 bg-[#96ADBD] h-20 rounded-t-xl"></div>
+                </div>
+                <p class="text-center text-gray-400 text-xs mt-8 uppercase">Analysis Mode</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPos = 1;
+        const main = document.getElementById('main');
+        const drawer = document.getElementById('intakeDrawer');
+        const bg = document.getElementById('bg');
+
+        function updateUI() {
+            main.style.transform = `translateY(-${currentPos * 100}vh)`;
+            bg.style.filter = `blur(${currentPos === 2 ? 45 : 25}px) brightness(${currentPos === 2 ? 0.5 : 0.7})`;
         }
 
-        /* 控制中心按钮 */
-        .control-panel { display: flex; gap: 40px; margin-top: 50px; }
-        .btn-circle {
-            width: 110px; height
+        let startY;
+        window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
+        window.addEventListener('touchend', e => {
+            if(drawer.classList.contains('open')) return;
+            const deltaY = e.changedTouches[0].pageY - startY;
+            if (Math.abs(deltaY) > 70) {
+                if (deltaY > 0 && currentPos > 0) currentPos--;
+                else if (deltaY < 0 && currentPos < 2) currentPos++;
+                updateUI();
+            }
+        });
+
+        function openIntake() { drawer.classList.add('open'); }
+        function closeDrawer() { drawer.classList.remove('open'); }
+        
+        function startVoiceSim() {
+            const input = document.getElementById('foodInput');
+            input.placeholder = "正在听你说话...";
+            setTimeout(() => {
+                input.value = "吃了两串二哥烧烤";
+                document.getElementById('tagArea').innerHTML = '<span class="px-4 py-2 bg-gray-100 rounded-full border border-dashed border-green-700 text-xs">🍢 烧烤 x2</span>';
+            }, 1500);
+        }
+
+        function confirmIntake() {
+            alert('已存入实验室数据库');
+            closeDrawer();
+        }
+
+        function pullRope(el) {
+            el.style.transform = "translateY(280px) scale(3)";
+            setTimeout(() => { el.style.transform = "translateY(0) scale(1)"; }, 1500);
+        }
+
+        updateUI(); // 初始化位置
+    </script>
+</body>
+</html>
