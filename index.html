@@ -13,66 +13,13 @@
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+            margin: 0; padding: 0; height: 100%;
             overflow: hidden;
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: #222;
         }
 
-        /* 录入抽屉样式 */
-        .drawer {
-            position: fixed;
-            bottom: -100%;
-            left: 0; width: 100%; height: 65vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-            z-index: 2000;
-            transition: bottom 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-            padding: 30px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
-        }
-
-        .drawer.open { bottom: 0; }
-
-        .input-area {
-            width: 100%; height: 120px;
-            border: none;
-            background: #f0f0f0;
-            border-radius: 15px;
-            padding: 15px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            outline: none;
-            resize: none;
-        }
-
-        .mic-btn {
-            width: 65px; height: 65px;
-            background: var(--sage-green);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 28px;
-            box-shadow: 0 5px 15px rgba(178, 172, 136, 0.4);
-            cursor: pointer;
-        }
-
-        .food-tag {
-            display: inline-block;
-            padding: 8px 15px;
-            background: #f8f8f8;
-            border-radius: 20px;
-            margin: 5px;
-            font-size: 14px;
-            border: 1px dashed var(--sage-green);
-            color: #555;
-        }
-
-        /* 动态背景 */
+        /* 背景层 */
         .background-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -80,241 +27,145 @@
             background-size: cover;
             filter: blur(var(--bg-blur)) brightness(0.8);
             z-index: -1;
-            transition: filter 0.5s, transform 0.5s;
-        }
-
-        /* 三层容器 */
-        .main-container {
-            height: 300vh;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .section {
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .control-panel {
-            display: flex;
-            gap: 2rem;
-            z-index: 10;
-        }
-
-        .btn-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: transform 0.2s;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .btn-circle:active { transform: scale(0.9); }
-        .btn-plus { background: rgba(178, 172, 136, 0.85); }
-        .btn-minus { background: rgba(150, 173, 189, 0.85); }
-        .btn-label { font-size: 12px; margin-top: 5px; opacity: 0.9; }
-
-        /* 麻绳时间轴 */
-        .rope-container {
-            width: 100%;
-            height: 2px;
-            background: #8b7355;
-            position: absolute;
-            top: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .polaroid {
-            width: 80px;
-            height: 100px;
-            background: white;
-            padding: 5px;
-            padding-bottom: 15px;
-            position: absolute;
-            top: -110px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transform-origin: top center;
-            animation: swing 3s ease-in-out infinite;
-            cursor: pointer;
-        }
-
-        .exercise-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 50%;
-            position: absolute;
-            top: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: swing 3.5s ease-in-out infinite reverse;
-        }
-
-        @keyframes swing {
-            0%, 100% { transform: rotate(3deg); }
-            50% { transform: rotate(-3deg); }
-        }
-
-        /* 下层看板 */
-        .stats-card {
-            background: rgba(255,255,255,0.9);
-            width: 90%;
-            height: 70%;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        .bar-group {
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-            height: 200px;
-        }
-
-        .bar { width: 25px; border-radius: 4px 4px 0 0; transition: height 0.5s; }
-        .bar-in { background: var(--sage-green); }
-        .bar-out { background: var(--dusty-blue); }
-
-        .summary-bar {
-            position: fixed;
-            top: 20px;
-            width: 90%;
-            left: 5%;
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(15px);
-            padding: 15px;
-            border-radius: 15px;
-            color: white;
-            display: flex;
-            justify-content: space-around;
-            z-index: 100;
-            border: 1px solid rgba(255,255,255,0.3);
-            opacity: 0;
-            transform: translateY(-20px);
             transition: 0.5s;
         }
 
-        .date-flipper {
-            position: absolute;
-            top: 20%;
-            color: white;
-            text-align: center;
+        /* 录入抽屉 - 提升 Z-index 确保可见 */
+        .drawer {
+            position: fixed;
+            bottom: -100%; left: 0; width: 100%; height: 65vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            z-index: 9999; 
+            transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            padding: 30px;
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
         }
+
+        .drawer.open { bottom: 0; }
+
+        .input-area {
+            width: 100%; height: 100px;
+            border: 2px solid #eee;
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 16px;
+            outline: none;
+            resize: none;
+            margin-bottom: 20px;
+        }
+
+        .mic-btn {
+            width: 70px; height: 70px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(178, 172, 136, 0.4);
+        }
+
+        .food-tag {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 13px;
+            border: 1px dashed var(--sage-green);
+        }
+
+        /* 三层主容器 */
+        .main-container {
+            height: 300vh;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .section { height: 100vh; width: 100vw; position: relative; display: flex; justify-content: center; align-items: center; }
+
+        /* 按钮设计 */
+        .btn-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; cursor: pointer; transition: 0.2s;
+            backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-plus { background: rgba(178, 172, 136, 0.9); }
+        .btn-minus { background: rgba(150, 173, 189, 0.9); }
+
+        /* 麻绳 Timeline */
+        .rope-container { width: 100%; height: 2px; background: #8b7355; position: absolute; top: 50%; }
+        .polaroid { width: 80px; height: 100px; background: white; padding: 5px; position: absolute; top: -110px; transform-origin: top center; animation: swing 3s ease-in-out infinite; cursor: pointer; }
+        
+        @keyframes swing { 0%, 100% { transform: rotate(3deg); } 50% { transform: rotate(-3deg); } }
+
+        .stats-card { background: white; width: 90%; height: 60%; border-radius: 25px; padding: 25px; }
     </style>
 </head>
 <body>
 
     <div class="background-layer" id="bg"></div>
 
-    <div class="summary-bar" id="summaryBar">
-        <div>🥬 饱腹达标</div>
-        <div>🍞 碳水偏高</div>
-        <div>🍗 蛋白充足</div>
-    </div>
-
     <div class="drawer" id="intakeDrawer">
-        <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6 cursor-pointer" onclick="closeDrawer()"></div>
-        <h3 class="text-xl font-bold mb-4 text-gray-700 text-center">🧪 录入今日能量</h3>
+        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 cursor-pointer" onclick="closeDrawer()"></div>
+        <h3 class="text-xl font-bold mb-6 text-center text-gray-800">🧪 能量采样中...</h3>
         
-        <div class="mic-btn" onclick="startVoice()">🎙️</div>
+        <div class="mic-btn" onclick="simulateVoice()">🎙️</div>
         
-        <textarea class="input-area" id="foodInput" placeholder="告诉 AI 你吃了什么？(点击麦克风模拟语音)"></textarea>
+        <textarea class="input-area" id="foodInput" placeholder="请输入你吃的食物，例如：两串二哥烧烤，一份凉面..."></textarea>
         
-        <div id="tagArea" class="mb-6 flex flex-wrap justify-center">
+        <div id="tagArea" class="flex flex-wrap justify-center mb-8">
             </div>
 
-        <button class="w-full py-4 bg-black text-white rounded-xl font-bold active:scale-95 transition-transform" onclick="confirmIntake()">确认挂上麻绳</button>
+        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-transform" onclick="confirmIntake()">确认挂上麻绳</button>
     </div>
 
     <div class="main-container" id="main">
         
         <div class="section">
             <div class="rope-container">
-                <div class="polaroid" style="left: 20%;" onclick="pullRope(this)">
-                    <img src="https://via.placeholder.com/70" class="w-full h-[70px] object-cover">
-                    <p class="text-[8px] mt-1 text-center">Breakfast</p>
+                <div class="polaroid" style="left: 25%;" onclick="pullRope(this)">
+                    <div class="w-full h-[70px] bg-gray-100 flex items-center justify-center text-xs">📷</div>
+                    <p class="text-[10px] mt-1 text-center">早饭</p>
                 </div>
-                <div class="polaroid" style="left: 60%;" onclick="pullRope(this)">
-                    <img src="https://via.placeholder.com/70" class="w-full h-[70px] object-cover">
-                    <p class="text-[8px] mt-1 text-center">Lunch</p>
-                </div>
-                <div class="exercise-icon" style="left: 40%;">🏃</div>
             </div>
-            <div class="absolute bottom-10 text-white opacity-50">下滑返回</div>
+            <div class="absolute bottom-10 text-white opacity-40">下滑返回主页</div>
         </div>
 
         <div class="section">
-            <div class="date-flipper">
-                <h2 class="text-3xl font-light">Today</h2>
-                <p class="opacity-70">April 2nd, Thursday</p>
+            <div class="flex flex-col items-center mb-20">
+                <h2 class="text-white text-4xl font-light mb-2">Today</h2>
+                <p class="text-white opacity-60">April 2nd, 2026</p>
             </div>
-
-            <div class="control-panel">
+            
+            <div class="flex gap-10 absolute">
                 <div class="btn-circle btn-plus" onclick="openIntake()">
-                    <span class="text-3xl">+</span>
-                    <span class="btn-label">能量摄入</span>
+                    <span class="text-4xl">+</span>
+                    <span class="text-[12px] mt-1">能量摄入</span>
                 </div>
-                <div class="btn-circle btn-minus" onclick="alert('开启运动录入')">
-                    <span class="text-3xl">-</span>
-                    <span class="btn-label">能量消耗</span>
+                <div class="btn-circle btn-minus" onclick="alert('即将开启运动录入抽屉')">
+                    <span class="text-4xl">-</span>
+                    <span class="text-[12px] mt-1">能量消耗</span>
                 </div>
             </div>
-            <div class="absolute top-10 text-white opacity-50">上划看足迹</div>
-            <div class="absolute bottom-10 text-white opacity-50">下划看分析</div>
         </div>
 
         <div class="section">
-            <div class="stats-card">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-gray-700">每周复盘 (kcal)</h3>
-                    <div class="text-xs bg-gray-200 px-2 py-1 rounded">合并柱状图</div>
+            <div class="stats-card shadow-2xl">
+                <h3 class="font-bold text-gray-800 mb-6">每周复盘 (Kcal)</h3>
+                <div class="flex justify-around items-end h-40 border-b border-gray-100 pb-2">
+                    <div class="w-6 bg-[#B2AC88] h-32 rounded-t"></div>
+                    <div class="w-6 bg-[#96ADBD] h-24 rounded-t"></div>
+                    <div class="w-6 bg-[#B2AC88] h-20 rounded-t"></div>
+                    <div class="w-6 bg-[#96ADBD] h-36 rounded-t"></div>
                 </div>
-                <div class="flex justify-between items-end h-[200px] border-b border-gray-200 pb-2">
-                    <div class="flex flex-col items-center">
-                        <div class="bar-group">
-                            <div class="bar bar-in" style="height: 140px;"></div>
-                            <div class="bar bar-out" style="height: 120px;"></div>
-                        </div>
-                        <span class="text-[10px] mt-2">Mon</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="bar-group">
-                            <div class="bar bar-in" style="height: 160px;"></div>
-                            <div class="bar bar-out" style="height: 180px;"></div>
-                        </div>
-                        <span class="text-[10px] mt-2">Tue</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="bar-group">
-                            <div class="bar bar-in" style="height: 90px;"></div>
-                            <div class="bar bar-out" style="height: 150px;"></div>
-                        </div>
-                        <span class="text-[10px] mt-2">Wed</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <div class="bar-group">
-                            <div class="bar bar-in" style="height: 120px;"></div>
-                            <div class="bar bar-out" style="height: 110px;"></div>
-                        </div>
-                        <span class="text-[10px] mt-2">Today</span>
-                    </div>
-                </div>
-                <p class="mt-4 text-xs text-gray-500 text-center">BMR: 1550 kcal (根据体重实时更新)</p>
+                <p class="text-center text-xs text-gray-400 mt-6">基础代谢：1550 kcal</p>
             </div>
         </div>
 
@@ -322,97 +173,71 @@
 
     <script>
         let currentPos = 1;
-        const container = document.getElementById('main');
-        const summaryBar = document.getElementById('summaryBar');
+        const main = document.getElementById('main');
+        const drawer = document.getElementById('intakeDrawer');
         const bg = document.getElementById('bg');
-        const intakeDrawer = document.getElementById('intakeDrawer');
 
-        // 手势处理
+        // 滑动逻辑
         let startY;
         window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
         window.addEventListener('touchend', e => {
-            // 如果抽屉是打开的，不触发页面滑动
-            if(intakeDrawer.classList.contains('open')) return;
-
+            if(drawer.classList.contains('open')) return;
             const deltaY = e.changedTouches[0].pageY - startY;
-            if (Math.abs(deltaY) > 50) {
+            if (Math.abs(deltaY) > 60) {
                 if (deltaY > 0 && currentPos > 0) currentPos--;
                 else if (deltaY < 0 && currentPos < 2) currentPos++;
-                updatePosition();
+                main.style.transform = `translateY(-${currentPos * 100}vh)`;
+                bg.style.filter = currentPos === 2 ? "blur(40px) brightness(0.6)" : "blur(20px) brightness(0.8)";
             }
         });
 
-        function updatePosition() {
-            container.style.transform = `translateY(-${currentPos * 100}vh)`;
-            summaryBar.style.opacity = currentPos === 0 ? "1" : "0";
-            summaryBar.style.transform = currentPos === 0 ? "translateY(0)" : "translateY(-20px)";
-
-            if (currentPos === 2) {
-                bg.style.filter = "blur(40px) brightness(0.5)";
-            } else {
-                bg.style.filter = "blur(20px) brightness(0.8)";
-            }
-        }
-
-        // 抽屉逻辑
+        // 抽屉函数
         function openIntake() {
-            intakeDrawer.classList.add('open');
+            drawer.classList.add('open');
         }
 
         function closeDrawer() {
-            intakeDrawer.classList.remove('open');
+            drawer.classList.remove('open');
         }
 
-        function startVoice() {
+        // 模拟语音录入
+        function simulateVoice() {
             const input = document.getElementById('foodInput');
             input.value = "";
-            input.placeholder = "正在倾听中...";
-            
+            input.placeholder = "👂 正在听你说话...";
             setTimeout(() => {
-                input.value = "中午在校友会食堂吃了一份美式炸鸡汉堡，配了小份薯条";
-                parseFood();
-            }, 1200);
-        }
-
-        function parseFood() {
-            const tagArea = document.getElementById('tagArea');
-            tagArea.innerHTML = `
-                <span class="food-tag">🍔 炸鸡汉堡 x1</span>
-                <span class="food-tag">🍟 薯条 (小份)</span>
-                <span class="food-tag">🥤 无糖可乐</span>
-            `;
+                input.value = "晚上吃了两串二哥烧烤，喝了一杯冰可乐";
+                document.getElementById('tagArea').innerHTML = `
+                    <span class="food-tag">🍢 烧烤 x2</span>
+                    <span class="food-tag">🥤 可乐 x1</span>
+                `;
+            }, 1500);
         }
 
         function confirmIntake() {
-            const btn = event.target;
-            btn.innerText = "数据已收录 ✅";
-            btn.style.background = "#4CAF50";
-            
+            const btn = event.currentTarget;
+            btn.innerText = "已录入成功 ✅";
+            btn.style.backgroundColor = "#4CAF50";
             setTimeout(() => {
                 closeDrawer();
                 btn.innerText = "确认挂上麻绳";
-                btn.style.background = "black";
-                // 此处未来可添加逻辑：动态在 Timeline 生成新的拍立得
+                btn.style.backgroundColor = "black";
             }, 1000);
         }
 
-        // 绳子拉伸效果
         function pullRope(el) {
-            el.style.transition = "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)";
-            el.style.transform = "translateY(250px) scale(2.5) rotate(0deg)";
+            el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            el.style.transform = "translateY(280px) scale(3)";
             el.style.zIndex = "1000";
-
             setTimeout(() => {
-                const newNote = prompt("🧪 实验记录：你吃了什么？", el.querySelector('p').innerText);
-                if (newNote) {
-                    el.querySelector('p').innerText = newNote;
-                }
-                el.style.transform = "translateY(0) scale(1) rotate(3deg)";
+                prompt("修改记录内容：", el.innerText);
+                el.style.transform = "translateY(0) scale(1)";
                 el.style.zIndex = "1";
             }, 800);
         }
 
-        updatePosition();
+        // 初始化
+        main.style.transform = `translateY(-${currentPos * 100}vh)`;
     </script>
 </body>
 </html>
