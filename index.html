@@ -3,76 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI 营养师原型</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Balance Lab | 能量平衡实验室</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --primary: #4CAF50; --bg: #f5f7fa; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
-        .circle-box { position: relative; width: 120px; height: 120px; margin: 0 auto 10px; border: 8px solid #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; border-top-color: var(--primary); }
-        .ingredient { text-align: left; margin: 15px 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
-        .info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-        input[type=range] { width: 100%; accent-color: var(--primary); }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; width: 100%; margin-top: 10px; }
+        :root {
+            --sage-green: #B2AC88;
+            --dusty-blue: #96ADBD;
+            --bg-blur: 20px;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #222;
+        }
+
+        /* 动态背景 */
+        .background-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+            background-size: cover;
+            filter: blur(var(--bg-blur)) brightness(0.8);
+            z-index: -1;
+            transition: filter 0.5s, transform 0.5s;
+        }
+
+        /* 三层容器 */
+        .main-container {
+            height: 300vh;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 中层：控制中心 */
+        .control-panel {
+            display: flex;
+            gap: 2rem;
+            z-index: 10;
+        }
+
+        .btn-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-circle:active { transform: scale(0.9); }
+        .btn-plus { background: rgba(178, 172, 136, 0.85); }
+        .btn-minus { background: rgba(150, 173, 189, 0.85); }
+
+        .btn-label { font-size: 12px; margin-top: 5px; opacity: 0.9; }
+
+        /* 上层：麻绳时间轴 */
+        .rope-container {
+            width: 100%;
+            height: 2px;
+            background: #8b7355;
+            position: absolute;
+            top: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .polaroid {
+            width: 80px;
+            height: 100px;
+            background: white;
+            padding: 5px;
+            padding-bottom: 15px;
+            position: absolute;
+            top: -110px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform-origin: top center;
+            animation: swing 3s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .exercise-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            position: absolute;
+            top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: swing 3.5s ease-in-out infinite reverse;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(3deg); }
+            50% { transform: rotate(-3deg); }
+        }
+
+        /* 下层：数据看板 */
+        .stats-card {
+            background: rgba(255,255,255,0.9);
+            width: 90%;
+            height: 70%;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .bar-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 200px;
+        }
+
+        .bar { width: 25px; border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .bar-in { background: var(--sage-green); }
+        .bar-out { background: var(--dusty-blue); }
+
+        /* 悬浮总结栏 */
+        .summary-bar {
+            position: fixed;
+            top: 20px;
+            width: 90%;
+            left: 5%;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(15px);
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.3);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: 0.5s;
+        }
+
+        /* 翻页时钟效果 */
+        .date-flipper {
+            position: absolute;
+            top: 20%;
+            color: white;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="circle-box">
-            <div style="font-size: 24px; font-weight: bold;" id="totalCal">0</div>
-            <div style="font-size: 12px; color: #888;">今日已摄入</div>
-        </div>
-        <p style="font-size: 14px; color: #666;">目标配额: 2000 kcal</p>
+    <div class="background-layer" id="bg"></div>
+
+    <div class="summary-bar" id="summaryBar">
+        <div>🥬 饱腹达标</div>
+        <div>🍞 碳水偏高</div>
+        <div>🍗 蛋白充足</div>
     </div>
 
-    <div class="card">
-        <h3 style="text-align: left; margin-top: 0;">🥗 AI 识别出的午餐</h3>
+    <div class="main-container" id="main">
         
-        <div class="ingredient">
-            <div class="info"><span>🍚 米饭</span><span id="label1">200g</span></div>
-            <input type="range" id="slider1" min="0" max="500" value="200" oninput="update()">
+        <div class="section">
+            <div class="rope-container">
+                <div class="polaroid" style="left: 20%;" onclick="pullRope(this)">
+                    <img src="https://via.placeholder.com/70" class="w-full h-[70px] object-cover">
+                    <p class="text-[8px] mt-1 text-center">Breakfast</p>
+                </div>
+                <div class="polaroid" style="left: 60%;" onclick="pullRope(this)">
+                    <img src="https://via.placeholder.com/70" class="w-full h-[70px] object-cover">
+                    <p class="text-[8px] mt-1 text-center">Lunch</p>
+                </div>
+                <div class="exercise-icon" style="left: 40%;">🏃</div>
+            </div>
+            <div class="absolute bottom-10 text-white opacity-50">下滑返回</div>
         </div>
 
-        <div class="ingredient">
-            <div class="info"><span>🍗 煎鸡胸肉</span><span id="label2">150g</span></div>
-            <input type="range" id="slider2" min="0" max="500" value="150" oninput="update()">
+        <div class="section">
+            <div class="date-flipper">
+                <h2 class="text-3xl font-light">Today</h2>
+                <p class="opacity-70">April 2nd, Thursday</p>
+            </div>
+
+            <div class="control-panel">
+                <div class="btn-circle btn-plus" onclick="alert('开启拍照/语音录入')">
+                    <span class="text-3xl">+</span>
+                    <span class="btn-label">能量摄入</span>
+                </div>
+                <div class="btn-circle btn-minus" onclick="alert('开启运动录入')">
+                    <span class="text-3xl">-</span>
+                    <span class="btn-label">能量消耗</span>
+                </div>
+            </div>
+            <div class="absolute top-10 text-white opacity-50">上划看足迹</div>
+            <div class="absolute bottom-10 text-white opacity-50">下划看分析</div>
         </div>
 
-        <button class="btn" onclick="alert('数据已同步至 Supabase 数据库')">确认保存</button>
-    </div>
+        <div class="section">
+            <div class="stats-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-gray-700">每周复盘 (kcal)</h3>
+                    <div class="text-xs bg-gray-200 px-2 py-1 rounded">合并柱状图</div>
+                </div>
+                <div class="flex justify-between items-end h-[200px] border-b border-gray-200 pb-2">
+                    <div class="flex flex-col items-center">
+                        <div class="bar-group">
+                            <div class="bar bar-in" style="height: 140px;"></div>
+                            <div class="bar bar-out" style="height: 120px;"></div>
+                        </div>
+                        <span class="text-[10px] mt-2">Mon</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bar-group">
+                            <div class="bar bar-in" style="height: 160px;"></div>
+                            <div class="bar bar-out" style="height: 180px;"></div>
+                        </div>
+                        <span class="text-[10px] mt-2">Tue</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bar-group">
+                            <div class="bar bar-in" style="height: 90px;"></div>
+                            <div class="bar bar-out" style="height: 150px;"></div>
+                        </div>
+                        <span class="text-[10px] mt-2">Wed</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bar-group">
+                            <div class="bar bar-in" style="height: 120px;"></div>
+                            <div class="bar bar-out" style="height: 110px;"></div>
+                        </div>
+                        <span class="text-[10px] mt-2">Today</span>
+                    </div>
+                </div>
+                <p class="mt-4 text-xs text-gray-500 text-center">BMR: 1550 kcal (根据体重实时更新)</p>
+            </div>
+        </div>
 
-    <div class="card">
-        <canvas id="myChart"></canvas>
     </div>
 
     <script>
-        function update() {
-            const s1 = document.getElementById('slider1').value;
-            const s2 = document.getElementById('slider2').value;
-            
-            document.getElementById('label1').innerText = s1 + 'g';
-            document.getElementById('label2').innerText = s2 + 'g';
-            
-            // 简单估算：米饭1.16大卡/g，鸡肉1.65大卡/g
-            const total = Math.round(s1 * 1.16 + s2 * 1.65);
-            document.getElementById('totalCal').innerText = total;
-        }
+        let currentPos = 1; // 0: Top, 1: Center, 2: Bottom
+        const container = document.getElementById('main');
+        const summaryBar = document.getElementById('summaryBar');
+        const bg = document.getElementById('bg');
 
-        // 初始化图表
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['周一', '周二', '周三', '周四', '今日'],
-                datasets: [
-                    { label: '摄入', data: [1800, 2200, 1900, 2050, 650], borderColor: '#4CAF50', tension: 0.3 },
-                    { label: '消耗', data: [2100, 1800, 2300, 1900, 400], borderColor: '#2196F3', tension: 0.3 }
-                ]
+        // 简易的手势处理
+        let startY;
+        window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
+        window.addEventListener('touchend', e => {
+            const deltaY = e.changedTouches[0].pageY - startY;
+            if (Math.abs(deltaY) > 50) {
+                if (deltaY > 0 && currentPos > 0) currentPos--;
+                else if (deltaY < 0 && currentPos < 2) currentPos++;
+                updatePosition();
             }
         });
-        
-        update(); // 初始计算一次
+
+        function updatePosition() {
+            container.style.transform = `translateY(-${currentPos * 100}vh)`;
+            
+            // 只有在顶部 Timeline 时显示悬浮总结
+            summaryBar.style.opacity = currentPos === 0 ? "1" : "0";
+            summaryBar.style.transform = currentPos === 0 ? "translateY(0)" : "translateY(-20px)";
+
+            // 改变背景模糊度
+            if (currentPos === 2) {
+                bg.style.filter = "blur(40px) brightness(0.5)";
+            } else {
+                bg.style.filter = "blur(20px) brightness(0.8)";
+            }
+        }
+
+        // 双击“拽下”绳子效果
+        function pullRope(el) {
+            el.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            el.style.transform = "translateY(150px) scale(2)";
+            setTimeout(() => {
+                if(confirm("进入编辑模式？")) {
+                    // 编辑逻辑
+                }
+                el.style.transform = "translateY(0) scale(1)";
+            }, 500);
+        }
+
+        // 默认初始化到中间
+        updatePosition();
     </script>
 </body>
 </html>
