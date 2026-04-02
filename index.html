@@ -175,3 +175,20 @@
             setTimeout(() => {
                 closeDrawer();
                 btn.innerText = "同步至实验室麻绳";
+                btn.style.backgroundColor = "black";
+            }, 1000);
+        }
+
+        function pullRope(el) {
+            el.style.transform = "translateY(280px) scale(3)";
+            el.style.zIndex = "1000";
+            setTimeout(() => { 
+                el.style.transform = "translateY(0) scale(1)";
+                el.style.zIndex = "1";
+            }, 1500);
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
