@@ -6,58 +6,50 @@
     <title>Balance Lab | 能量平衡实验室</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --sage-green: #B2AC88;
-            --dusty-blue: #96ADBD;
-            --bg-blur: 25px;
-        }
-
+        :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; --bg-blur: 25px; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; }
-
-        /* 动态模糊背景 */
+        
         .background-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
-            background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; transition: 0.8s;
         }
 
         /* 录入抽屉 */
         .drawer {
             position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh;
-            background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
             border-top-left-radius: 40px; border-top-right-radius: 40px;
-            z-index: 9999; transition: bottom 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 25px; box-shadow: 0 -20px 50px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column;
         }
         .drawer.open { bottom: 0; }
 
-        /* 多模态功能条 */
         .media-actions { display: flex; justify-content: space-around; margin-bottom: 25px; }
-        .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
-        .action-item:active { transform: scale(0.9); }
-        .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .action-icon { width: 60px; height: 60px; border-radius: 20px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 26px; transition: 0.2s; }
+        .action-item:active .action-icon { background: #e0e0e0; transform: scale(0.9); }
 
         .input-area { width: 100%; height: 120px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 18px; font-size: 16px; outline: none; resize: none; margin-bottom: 20px; }
 
-        /* 主容器 */
-        .main-container { height: 300vh; transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1); }
+        /* 主容器布局 */
+        .main-container { height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-        /* 时间标题区 */
         .header-info { position: absolute; top: 12%; text-align: center; width: 100%; }
-        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 15px 35px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.15); }
+        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 15px 35px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* 控制按钮 */
-        .control-panel { display: flex; gap: 40px; margin-top: 80px; }
-        .btn-circle { width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.2); }
+        .control-panel { display: flex; gap: 40px; margin-top: 60px; }
+        .btn-circle { width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .btn-plus { background: var(--sage-green); }
         .btn-minus { background: var(--dusty-blue); }
 
-        /* 麻绳轴 */
         .rope-container { width: 100%; height: 3px; background: #6b5344; position: absolute; top: 50%; }
-        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; transform-origin: top center; animation: swing 4s ease-in-out infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; transform-origin: top center; animation: swing 4s infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
         @keyframes swing { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
+        
+        /* 隐藏的真实输入框 */
+        #cameraInput, #albumInput { display: none; }
     </style>
 </head>
 <body>
@@ -68,15 +60,27 @@
         <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 cursor-pointer" onclick="closeDrawer()"></div>
         <h3 class="text-xl font-bold mb-8 text-center text-gray-800">🔬 采集能量样本</h3>
         
+        <input type="file" id="cameraInput" accept="image/*" capture="camera" onchange="handleFile(this)">
+        <input type="file" id="albumInput" accept="image/*" onchange="handleFile(this)">
+
         <div class="media-actions">
-            <div class="action-item" onclick="alert('调起系统相机')"><div class="action-icon">📷</div><span class="text-xs text-gray-500">拍照</span></div>
-            <div class="action-item" onclick="alert('打开手机相册')"><div class="action-icon">🖼️</div><span class="text-xs text-gray-500">相册</span></div>
-            <div class="action-item" onclick="startVoiceSim()"><div class="action-icon" id="micIcon">🎙️</div><span class="text-xs text-gray-500">语音</span></div>
+            <div class="action-item" onclick="document.getElementById('cameraInput').click()">
+                <div class="action-icon">📷</div>
+                <span class="text-xs text-gray-500 font-bold">拍照</span>
+            </div>
+            <div class="action-item" onclick="document.getElementById('albumInput').click()">
+                <div class="action-icon">🖼️</div>
+                <span class="text-xs text-gray-500 font-bold">相册</span>
+            </div>
+            <div class="action-item" onclick="startVoiceSim()">
+                <div class="action-icon">🎙️</div>
+                <span class="text-xs text-gray-500 font-bold">语音</span>
+            </div>
         </div>
         
-        <textarea class="input-area" id="foodInput" placeholder="描述你的饮食..."></textarea>
-        <div id="tagArea" class="flex flex-wrap justify-center mb-10 min-h-[40px]"></div>
-        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all" onclick="confirmIntake()">同步至实验室麻绳</button>
+        <textarea class="input-area" id="foodInput" placeholder="描述你的饮食或上传照片..."></textarea>
+        <div id="tagArea" class="flex flex-wrap justify-center mb-8 min-h-[40px]"></div>
+        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold" onclick="confirmIntake()">同步至实验室麻绳</button>
     </div>
 
     <div class="main-container" id="main">
@@ -87,38 +91,35 @@
                     <p class="text-[10px] mt-2 text-center text-gray-600">Sample-01</p>
                 </div>
             </div>
-            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动返回主控</div>
+            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动返回</div>
         </div>
 
         <div class="section">
             <div class="header-info">
                 <div class="date-card">
                     <h2 class="text-white text-4xl font-light tracking-widest">TODAY</h2>
-                    <p class="text-white opacity-60 text-sm mt-1 uppercase">Thursday • April 2nd</p>
+                    <p class="text-white opacity-60 text-sm mt-1">Thursday • April 2nd</p>
                 </div>
             </div>
-            
             <div class="control-panel">
                 <div class="btn-circle btn-plus" onclick="openIntake()">
-                    <span class="text-4xl font-light">+</span>
-                    <span class="text-[11px] mt-2 uppercase">Intake</span>
+                    <span class="text-4xl">+</span>
+                    <span class="text-[11px] mt-2">Intake</span>
                 </div>
-                <div class="btn-circle btn-minus" onclick="alert('Burn抽屉开发中')">
-                    <span class="text-4xl font-light">−</span>
-                    <span class="text-[11px] mt-2 uppercase">Burn</span>
+                <div class="btn-circle btn-minus" onclick="alert('即将开启消耗录入')">
+                    <span class="text-4xl">−</span>
+                    <span class="text-[11px] mt-2">Burn</span>
                 </div>
             </div>
-            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动看数据分析</div>
         </div>
 
         <div class="section">
-            <div class="w-[85%] h-[60%] bg-white/95 backdrop-blur-xl rounded-[40px] p-8 shadow-2xl">
+            <div class="w-[85%] h-[60%] bg-white/95 rounded-[40px] p-8 shadow-2xl">
                 <h3 class="font-bold text-gray-800 text-lg mb-8">Weekly Balance</h3>
                 <div class="flex justify-around items-end h-40 border-b border-gray-100 pb-4">
                     <div class="w-8 bg-[#B2AC88] h-32 rounded-t-xl"></div>
                     <div class="w-8 bg-[#96ADBD] h-20 rounded-t-xl"></div>
                 </div>
-                <p class="text-center text-gray-400 text-xs mt-8 uppercase">Analysis Mode</p>
             </div>
         </div>
     </div>
@@ -127,11 +128,9 @@
         let currentPos = 1;
         const main = document.getElementById('main');
         const drawer = document.getElementById('intakeDrawer');
-        const bg = document.getElementById('bg');
 
         function updateUI() {
             main.style.transform = `translateY(-${currentPos * 100}vh)`;
-            bg.style.filter = `blur(${currentPos === 2 ? 45 : 25}px) brightness(${currentPos === 2 ? 0.5 : 0.7})`;
         }
 
         let startY;
@@ -148,27 +147,31 @@
 
         function openIntake() { drawer.classList.add('open'); }
         function closeDrawer() { drawer.classList.remove('open'); }
-        
+
+        // 处理文件上传逻辑
+        function handleFile(input) {
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('foodInput').value = `已成功采样照片：${fileName}\n正在通过 AI 解析热量结构...`;
+                // 模拟识别标签
+                document.getElementById('tagArea').innerHTML = '<span class="px-4 py-2 bg-green-50 rounded-full border border-dashed border-green-600 text-xs text-green-800">📸 图像样本已就绪</span>';
+            }
+        }
+
         function startVoiceSim() {
             const input = document.getElementById('foodInput');
-            input.placeholder = "正在听你说话...";
+            input.value = "";
+            input.placeholder = "正在分析环境音...";
             setTimeout(() => {
-                input.value = "吃了两串二哥烧烤";
-                document.getElementById('tagArea').innerHTML = '<span class="px-4 py-2 bg-gray-100 rounded-full border border-dashed border-green-700 text-xs">🍢 烧烤 x2</span>';
-            }, 1500);
+                input.value = "吃了两串二哥烧烤，一杯可乐";
+                document.getElementById('tagArea').innerHTML = '<span class="px-4 py-2 bg-gray-100 rounded-full border border-dashed border-green-700 text-xs">🍢 烧烤样本 x2</span>';
+            }, 1200);
         }
 
         function confirmIntake() {
-            alert('已存入实验室数据库');
-            closeDrawer();
-        }
-
-        function pullRope(el) {
-            el.style.transform = "translateY(280px) scale(3)";
-            setTimeout(() => { el.style.transform = "translateY(0) scale(1)"; }, 1500);
-        }
-
-        updateUI(); // 初始化位置
-    </script>
-</body>
-</html>
+            const btn = event.currentTarget;
+            btn.innerText = "数据同步成功 ✅";
+            btn.style.backgroundColor = "#4CAF50";
+            setTimeout(() => {
+                closeDrawer();
+                btn.innerText = "同步至实验室麻绳";
