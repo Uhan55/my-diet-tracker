@@ -11,40 +11,21 @@
     <style>
         :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; --bg-blur: 25px; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center; background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; transition: 0.8s; }
-        
-        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; box-shadow: 0 -20px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center; background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; }
+        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; box-shadow: 0 -20px 50px rgba(0,0,0,0.3); }
         .drawer.open { bottom: 0; }
-
-        .media-actions { display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
         .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 24px; }
-        
-        .recording .action-icon { background: #fee2e2; color: #ef4444; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        .input-area { width: 100%; height: 110px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 15px; font-size: 15px; outline: none; resize: none; line-height: 1.6; }
-        
-        .analyze-btn { background: #3b82f6; color: white; padding: 14px; border-radius: 18px; font-weight: 800; font-size: 14px; margin: 15px 0; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
-        .analyze-btn:active { transform: scale(0.96); }
-
+        .input-area { width: 100%; height: 110px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 15px; font-size: 14px; outline: none; resize: none; line-height: 1.5; }
+        .analyze-btn { background: #3b82f6; color: white; padding: 14px; border-radius: 18px; font-weight: 800; width: 100%; margin: 15px 0; cursor: pointer; }
         .main-container { height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 12px 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); text-align: center; }
-        
-        /* 恢复双按钮控制面板 */
         .control-panel { display: flex; gap: 40px; margin-top: 60px; }
-        .btn-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.2s; }
-        .btn-circle:active { transform: scale(0.9); }
+        .btn-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .btn-plus { background: var(--sage-green); }
         .btn-minus { background: var(--dusty-blue); }
-        
         .rope-container { width: 100%; height: 3px; background: #6b5344; position: absolute; top: 50%; }
-        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; transform-origin: top center; animation: swing 4s infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
-        @keyframes swing { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
-        
+        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
         #cameraInput, #albumInput { display: none; }
-        .food-tag { display: inline-block; padding: 5px 12px; background: #f0f0f0; border-radius: 12px; margin: 3px; font-size: 11px; border: 1px dashed #ccc; font-weight: bold; color: #444; }
     </style>
 </head>
 <body>
@@ -52,95 +33,64 @@
     <div class="background-layer" id="bg"></div>
 
     <div class="drawer" id="intakeDrawer">
-        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 cursor-pointer" onclick="closeDrawer()"></div>
-        <h3 class="text-base font-bold mb-4 text-center text-gray-700 tracking-[0.2em] uppercase">Data Intake</h3>
+        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" onclick="closeDrawer()"></div>
         
-        <input type="file" id="cameraInput" accept="image/*" capture="camera">
-        <input type="file" id="albumInput" accept="image/*">
-
-        <div class="media-actions">
-            <div class="action-item" onclick="document.getElementById('cameraInput').click()">
-                <div class="action-icon">📷</div><span class="text-[10px] text-gray-400 font-bold uppercase">Photo</span>
-            </div>
-            <div class="action-item" onclick="document.getElementById('albumInput').click()">
-                <div class="action-icon">🖼️</div><span class="text-[10px] text-gray-400 font-bold uppercase">Album</span>
-            </div>
-            <div id="voiceToggleBtn" class="action-item" onclick="toggleVoice()">
-                <div class="action-icon" id="voiceIcon">🎙️</div><span class="text-[10px] text-gray-400 font-bold uppercase">Voice</span>
-            </div>
+        <div class="flex justify-around mb-6">
+            <div onclick="document.getElementById('cameraInput').click()" class="flex flex-col items-center gap-2"><div class="action-icon">📷</div><span class="text-[10px] text-gray-400">相机</span></div>
+            <div onclick="document.getElementById('albumInput').click()" class="flex flex-col items-center gap-2"><div class="action-icon">🖼️</div><span class="text-[10px] text-gray-400">相册</span></div>
+            <div onclick="toggleVoice()" class="flex flex-col items-center gap-2"><div class="action-icon" id="voiceIcon">🎙️</div><span class="text-[10px] text-gray-400">语音</span></div>
         </div>
         
-        <textarea class="input-area shadow-sm" id="foodInput" placeholder="输入采样数据..."></textarea>
-        
-        <button class="analyze-btn" id="analyzeBtn" onclick="triggerAIAnalysis()">
-            <span>🔥 热量分析</span>
-        </button>
-
-        <div id="tagArea" class="flex flex-wrap justify-center mb-4 overflow-y-auto max-h-20"></div>
-        
-        <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all opacity-40 cursor-not-allowed" onclick="confirmIntake()" disabled>
-            同步至实验室麻绳
-        </button>
-
-        <p class="text-[10px] text-center mt-4 text-gray-400 cursor-pointer underline" onclick="resetKey()">[ 重置 API Key 授权 ]</p>
+        <textarea class="input-area" id="foodInput" placeholder="输入或录音..."></textarea>
+        <button class="analyze-btn" id="analyzeBtn" onclick="triggerAIAnalysis()">🔥 热量分析</button>
+        <div id="tagArea" class="flex flex-wrap justify-center mb-4 min-h-[30px]"></div>
+        <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold opacity-30" onclick="confirmIntake()" disabled>同步至麻绳</button>
+        <p class="text-[10px] text-center mt-4 text-gray-400 underline" onclick="resetKey()">[ 重置 API Key ]</p>
     </div>
 
     <div class="main-container" id="main">
         <div class="section"><div class="rope-container" id="ropeContainer"></div></div>
-        
         <div class="section">
-            <div class="date-card">
-                <h2 class="text-white text-3xl font-light tracking-[0.3em] uppercase">Lab.Today</h2>
-                <p class="text-white/60 text-[10px] mt-2 uppercase tracking-widest">Akron • April 2, 2026</p>
+            <div class="bg-white/10 backdrop-blur-lg p-6 rounded-3xl border border-white/20 text-center">
+                <h2 class="text-white text-3xl font-light tracking-[0.3em]">LAB.TODAY</h2>
+                <p class="text-white/60 text-[10px] mt-2 uppercase">Akron • 2026</p>
             </div>
             <div class="control-panel">
-                <div class="btn-circle btn-plus" onclick="openIntake()">
-                    <span class="text-4xl">+</span><span class="text-[10px] mt-2 font-bold uppercase">Intake</span>
-                </div>
-                <div class="btn-circle btn-minus" onclick="alert('消耗录入模块正在构建中...')">
-                    <span class="text-4xl">−</span><span class="text-[10px] mt-2 font-bold uppercase">Burn</span>
-                </div>
+                <div class="btn-circle btn-plus" onclick="openIntake()"><span class="text-3xl">+</span><span class="text-[10px] uppercase">Intake</span></div>
+                <div class="btn-circle btn-minus" onclick="alert('Burn模块构建中')"><span class="text-3xl">−</span><span class="text-[10px] uppercase">Burn</span></div>
             </div>
         </div>
-
-        <div class="section">
-            <div class="w-[88%] h-[60%] bg-white/95 rounded-[35px] p-8 shadow-2xl flex flex-col items-center justify-center">
-                <p class="text-gray-300 text-[10px] tracking-[0.4em] uppercase">Data Analysis</p>
-            </div>
-        </div>
+        <div class="section"></div>
     </div>
+
+    <input type="file" id="cameraInput" accept="image/*" capture="camera">
+    <input type="file" id="albumInput" accept="image/*">
 
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
+        window.resetKey = () => { localStorage.removeItem('GEMINI_LAB_KEY'); location.reload(); };
+
         function getSafeKey() {
             let key = localStorage.getItem('GEMINI_LAB_KEY');
-            if (!key || key.length < 10) {
-                key = prompt("⚠️ 实验室安全授权：\n请输入您的新 Gemini API Key。");
+            if (!key) {
+                key = prompt("请输入您的新 Gemini API Key (已打通网络测试)");
                 if (key) localStorage.setItem('GEMINI_LAB_KEY', key.trim());
             }
             return key;
         }
 
-        window.resetKey = () => { localStorage.removeItem('GEMINI_LAB_KEY'); location.reload(); };
-
         let currentPos = 1;
-        let isRecording = false;
-        let recognition = null;
-        let lastImageData = null;
-
         const main = document.getElementById('main');
         const drawer = document.getElementById('intakeDrawer');
-        const bg = document.getElementById('bg');
         const foodInput = document.getElementById('foodInput');
         const tagArea = document.getElementById('tagArea');
-        const ropeContainer = document.getElementById('ropeContainer');
-        const confirmBtn = document.getElementById('confirmBtn');
         const analyzeBtn = document.getElementById('analyzeBtn');
 
         window.openIntake = () => drawer.classList.add('open');
         window.closeDrawer = () => drawer.classList.remove('open');
 
+        // 滑动控制
         let startY;
         window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
         window.addEventListener('touchend', e => {
@@ -150,118 +100,59 @@
                 if (deltaY > 0 && currentPos > 0) currentPos--;
                 else if (deltaY < 0 && currentPos < 2) currentPos++;
                 main.style.transform = `translateY(-${currentPos * 100}vh)`;
-                bg.style.filter = `blur(${currentPos === 2 ? 45 : 25}px) brightness(${currentPos === 2 ? 0.5 : 0.7})`;
             }
         });
 
-        // 核心分析触发
+        // 核心 AI 调试版
         window.triggerAIAnalysis = async () => {
             const KEY = getSafeKey();
             if(!KEY) return;
+            analyzeBtn.innerText = "⚡ 正在握手...";
+            foodInput.value = "正在连接 Google 服务器...";
 
-            const content = foodInput.value.trim();
-            if (!content && !lastImageData) return alert("请先采样数据");
-
-            analyzeBtn.innerHTML = "⚡ 正在解析数据...";
-            tagArea.innerHTML = '<span class="animate-pulse text-xs text-blue-600 font-bold">🧪 连接云端中...</span>';
-            
             try {
                 const genAI = new GoogleGenerativeAI(KEY);
-                // 强制使用 flash 模型，速度最快且适合视觉
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-                const prompt = "你是专业营养师。分析该食物。输出：第一行名称，第二行热量数字，第三行建议。";
                 
-                let result;
-                if (lastImageData) {
-                    result = await model.generateContent([prompt, { inlineData: { data: lastImageData.split(",")[1], mimeType: "image/jpeg" } }]);
-                } else {
-                    result = await model.generateContent(prompt + " 描述：" + content);
-                }
-
+                // 发起请求
+                const result = await model.generateContent("分析食物：" + foodInput.value + "。返回格式：名称\n热量\n建议");
                 const response = await result.response;
                 const text = response.text();
                 
-                const lines = text.split('\n').filter(l => l.trim() !== "");
-                tagArea.innerHTML = `<span class="food-tag">✅ ${lines[0]}</span><span class="food-tag">🔥 ${lines[1]} kcal</span>`;
-                confirmBtn.dataset.latest = `${lines[0]}|${lines[1]}`;
-                confirmBtn.disabled = false;
-                confirmBtn.classList.remove('opacity-40', 'cursor-not-allowed');
-                analyzeBtn.innerHTML = "🔥 分析成功";
-                analyzeBtn.style.background = "#10b981";
-
+                const lines = text.split('\n');
+                tagArea.innerHTML = `<span class="px-3 py-1 bg-green-100 rounded-full text-xs font-bold text-green-700">${lines[0]} | ${lines[1]} kcal</span>`;
+                foodInput.value = text;
+                document.getElementById('confirmBtn').disabled = false;
+                document.getElementById('confirmBtn').classList.remove('opacity-30');
+                analyzeBtn.innerText = "🔥 分析成功";
             } catch (err) {
-                console.error("AI Error:", err);
-                analyzeBtn.innerHTML = "🔥 热量分析"; // 重置文案
-                
-                let errDisplay = "传送失败：";
-                if(err.message.includes("API_KEY_INVALID")) errDisplay += "Key无效";
-                else if(err.message.includes("fetch")) errDisplay += "网络拦截(请开全局模式)";
-                else errDisplay += "AI暂不可用";
-                
-                tagArea.innerHTML = `<span class="text-[10px] text-red-500 font-bold">❌ ${errDisplay}</span>`;
-                foodInput.value += `\n\n[ERROR]: ${err.message}`;
+                console.error(err);
+                // 深度诊断回显
+                foodInput.value = `[DEBUG ERROR REPORT]\nStatus: FAIL\nMessage: ${err.message}\nStack: ${err.stack.split('\n')[0]}\n\n请确认：\n1. VPN是否为'全局模式'\n2. API Key是否在AI Studio中显示为绿色Active`;
+                analyzeBtn.innerText = "🔥 重试分析";
             }
         };
 
+        // 语音
+        let recognition;
         window.toggleVoice = () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert("不支持语音接口");
-            const iconBtn = document.getElementById('voiceToggleBtn');
-            const icon = document.getElementById('voiceIcon');
-            if (!isRecording) {
+            if(!recognition) {
                 recognition = new SpeechRecognition();
                 recognition.lang = 'zh-CN';
-                recognition.continuous = true;
-                recognition.onstart = () => {
-                    isRecording = true; iconBtn.classList.add('recording'); icon.innerHTML = "🔴";
-                    foodInput.placeholder = "录音中...再次点击停止";
-                };
-                recognition.onresult = (e) => {
-                    foodInput.value = Array.from(e.results).map(r => r[0].transcript).join('');
-                };
-                recognition.start();
-            } else {
-                recognition.stop(); isRecording = false; iconBtn.classList.remove('recording'); icon.innerHTML = "🎙️";
+                recognition.onresult = (e) => { foodInput.value = e.results[0][0].transcript; };
             }
+            recognition.start();
         };
 
-        const fileHandler = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                lastImageData = evt.target.result;
-                foodInput.value = `[图像已挂载]: ${file.name}\n请点击热量分析。`;
-                tagArea.innerHTML = '<span class="food-tag">📸 图片就绪</span>';
-            };
-            reader.readAsDataURL(file);
-        };
-        document.getElementById('cameraInput').onchange = fileHandler;
-        document.getElementById('albumInput').onchange = fileHandler;
-
+        // 同步
         window.confirmIntake = () => {
-            const data = confirmBtn.dataset.latest;
-            const [name, cals] = data.split('|');
             const card = document.createElement('div');
             card.className = 'polaroid';
-            card.style.left = `${Math.random() * 60 + 10}%`;
-            card.innerHTML = `
-                <div class="w-full h-[75px] bg-gray-50 flex items-center justify-center text-2xl">📸</div>
-                <p class="text-[9px] mt-2 text-center text-gray-500 font-bold uppercase tracking-tighter">${name}</p>
-                <p class="text-[8px] text-center text-red-400 font-bold">-${cals}KCAL</p>
-            `;
-            card.onclick = function() {
-                this.style.transition = "0.5s"; this.style.transform = "translateY(280px) scale(3)";
-                setTimeout(() => { this.style.transform = "translateY(0) scale(1)"; }, 2000);
-            };
-            ropeContainer.appendChild(card);
-            confirmBtn.innerText = "已同步 ✅"; confirmBtn.style.backgroundColor = "#10b981";
-            setTimeout(() => { 
-                closeDrawer(); confirmBtn.innerText = "同步至实验室麻绳"; 
-                confirmBtn.style.backgroundColor = "black"; confirmBtn.disabled = true;
-                confirmBtn.classList.add('opacity-40', 'cursor-not-allowed');
-                tagArea.innerHTML = ""; foodInput.value = "";
-            }, 1000);
+            card.style.left = `${Math.random()*60+10}%`;
+            card.innerHTML = `<div class='h-16 bg-gray-100 flex items-center justify-center text-xl'>🍱</div><p class='text-[8px] text-center mt-1'>${foodInput.value.split('\n')[0]}</p>`;
+            document.getElementById('ropeContainer').appendChild(card);
+            closeDrawer();
         };
 
         main.style.transform = "translateY(-100vh)";
