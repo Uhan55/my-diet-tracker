@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Balance Lab | 能量平衡实验室</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
     <style>
         :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; --bg-blur: 25px; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -15,7 +22,6 @@
             background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; transition: 0.8s;
         }
 
-        /* 录入抽屉 */
         .drawer {
             position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh;
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
@@ -28,28 +34,25 @@
         .media-actions { display: flex; justify-content: space-around; margin-bottom: 25px; }
         .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
         .action-icon { width: 60px; height: 60px; border-radius: 20px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 26px; transition: 0.2s; }
-        .action-item:active .action-icon { background: #e0e0e0; transform: scale(0.9); }
+        
+        .input-area { width: 100%; height: 120px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 18px; font-size: 15px; outline: none; resize: none; margin-bottom: 15px; line-height: 1.6; }
 
-        .input-area { width: 100%; height: 120px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 18px; font-size: 16px; outline: none; resize: none; margin-bottom: 20px; }
-
-        /* 主容器布局 */
         .main-container { height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-        .header-info { position: absolute; top: 12%; text-align: center; width: 100%; }
-        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 15px 35px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); }
+        .header-info { position: absolute; top: 10%; text-align: center; width: 100%; }
+        .date-card { display: inline-block; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 12px 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); }
 
         .control-panel { display: flex; gap: 40px; margin-top: 60px; }
-        .btn-circle { width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: 0.2s; }
-        .btn-circle:active { transform: scale(0.9); }
+        .btn-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .btn-plus { background: var(--sage-green); }
         .btn-minus { background: var(--dusty-blue); }
 
-        .rope-container { width: 100%; height: 3px; background: #6b5344; position: absolute; top: 50%; }
+        .rope-container { width: 100%; height: 2px; background: #6b5344; position: absolute; top: 50%; }
         .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; transform-origin: top center; animation: swing 4s infinite; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        @keyframes swing { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
         
         #cameraInput, #albumInput { display: none; }
+        .food-tag { display: inline-block; padding: 6px 12px; background: #f0f0f0; border-radius: 15px; margin: 4px; font-size: 12px; border: 1px dashed #ccc; }
     </style>
 </head>
 <body>
@@ -57,30 +60,30 @@
     <div class="background-layer" id="bg"></div>
 
     <div class="drawer" id="intakeDrawer">
-        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 cursor-pointer" onclick="closeDrawer()"></div>
-        <h3 class="text-xl font-bold mb-8 text-center text-gray-800">🔬 采集能量样本</h3>
+        <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 cursor-pointer" onclick="closeDrawer()"></div>
+        <h3 class="text-lg font-bold mb-6 text-center text-gray-700">🔬 实时能量采样解析</h3>
         
-        <input type="file" id="cameraInput" accept="image/*" capture="camera" onchange="handleFile(this)">
-        <input type="file" id="albumInput" accept="image/*" onchange="handleFile(this)">
+        <input type="file" id="cameraInput" accept="image/*" capture="camera">
+        <input type="file" id="albumInput" accept="image/*">
 
         <div class="media-actions">
-            <div class="action-item" onclick="document.getElementById('cameraInput').click()">
+            <div class="action-item" id="btnCamera">
                 <div class="action-icon">📷</div>
-                <span class="text-xs text-gray-500 font-bold">拍照</span>
+                <span class="text-[10px] text-gray-400 font-bold">拍照识别</span>
             </div>
-            <div class="action-item" onclick="document.getElementById('albumInput').click()">
+            <div class="action-item" id="btnAlbum">
                 <div class="action-icon">🖼️</div>
-                <span class="text-xs text-gray-500 font-bold">相册</span>
+                <span class="text-[10px] text-gray-400 font-bold">相册导入</span>
             </div>
             <div class="action-item" onclick="startRealVoice()">
                 <div class="action-icon" id="voiceIcon">🎙️</div>
-                <span class="text-xs text-gray-500 font-bold">语音</span>
+                <span class="text-[10px] text-gray-400 font-bold">语音录入</span>
             </div>
         </div>
         
-        <textarea class="input-area" id="foodInput" placeholder="描述你的饮食或上传照片..."></textarea>
-        <div id="tagArea" class="flex flex-wrap justify-center mb-8 min-h-[40px]"></div>
-        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold active:bg-gray-800 transition-colors" onclick="confirmIntake()">同步至实验室麻绳</button>
+        <textarea class="input-area" id="foodInput" placeholder="描述你的饮食或等待 AI 解析..."></textarea>
+        <div id="tagArea" class="flex flex-wrap justify-center mb-6 overflow-y-auto max-h-24"></div>
+        <button class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all" onclick="confirmIntake()">挂载至实验麻绳</button>
     </div>
 
     <div class="main-container" id="main">
@@ -88,45 +91,53 @@
             <div class="rope-container">
                 <div class="polaroid" style="left: 20%;" onclick="pullRope(this)">
                     <div class="w-full h-[75px] bg-gray-100 flex items-center justify-center text-xl">🥗</div>
-                    <p class="text-[10px] mt-2 text-center text-gray-600 font-bold">SAMPLE-01</p>
+                    <p class="text-[9px] mt-2 text-center text-gray-500 font-bold uppercase">Sample-01</p>
                 </div>
             </div>
-            <div class="absolute bottom-12 text-white opacity-40 text-sm">↓ 滑动返回主页</div>
+            <div class="absolute bottom-10 text-white opacity-40 text-xs tracking-widest">SCROLL DOWN</div>
         </div>
 
         <div class="section">
             <div class="header-info">
                 <div class="date-card">
-                    <h2 class="text-white text-4xl font-light tracking-widest">TODAY</h2>
-                    <p class="text-white opacity-60 text-sm mt-1 uppercase">Thursday • April 2nd</p>
+                    <h2 class="text-white text-3xl font-light tracking-[0.2em]">LAB.TODAY</h2>
+                    <p class="text-white/60 text-[10px] mt-1 uppercase">Akron, OH • April 2, 2026</p>
                 </div>
             </div>
             <div class="control-panel">
                 <div class="btn-circle btn-plus" onclick="openIntake()">
                     <span class="text-4xl">+</span>
-                    <span class="text-[11px] mt-2 font-bold uppercase">Intake</span>
+                    <span class="text-[10px] mt-2 font-bold uppercase tracking-tighter">Intake</span>
                 </div>
-                <div class="btn-circle btn-minus" onclick="alert('消耗录入模块建设中...')">
+                <div class="btn-circle btn-minus" onclick="alert('消耗记录开发中')">
                     <span class="text-4xl">−</span>
-                    <span class="text-[11px] mt-2 font-bold uppercase">Burn</span>
+                    <span class="text-[10px] mt-2 font-bold uppercase tracking-tighter">Burn</span>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="w-[85%] h-[60%] bg-white/95 backdrop-blur-md rounded-[40px] p-8 shadow-2xl">
-                <h3 class="font-bold text-gray-800 text-lg mb-8">Weekly Balance</h3>
-                <div class="flex justify-around items-end h-40 border-b border-gray-100 pb-4">
-                    <div class="w-8 bg-[#B2AC88] h-32 rounded-t-xl"></div>
-                    <div class="w-8 bg-[#96ADBD] h-20 rounded-t-xl"></div>
-                    <div class="w-8 bg-[#B2AC88] h-36 rounded-t-xl"></div>
+            <div class="w-[88%] h-[60%] bg-white/95 rounded-[35px] p-8 shadow-2xl">
+                <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                    <h3 class="font-bold text-gray-800 tracking-tight">DATA ANALYSIS</h3>
+                    <span class="text-[10px] text-gray-400 font-mono">BMR: 1550</span>
                 </div>
-                <p class="text-center text-gray-400 text-[10px] mt-8 uppercase tracking-widest">Lab Analysis Mode</p>
+                <div class="flex justify-around items-end h-32 mb-8">
+                    <div class="w-8 bg-[#B2AC88] h-24 rounded-t-lg"></div>
+                    <div class="w-8 bg-[#96ADBD] h-16 rounded-t-lg"></div>
+                    <div class="w-8 bg-gray-200 h-28 rounded-t-lg"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // 配置 API Key (由 Yuhan 提供)
+        const API_KEY = "AIzaSyDWZF-sQom_cnm7RMEKY33TGpNbpz1mkfQ";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
         let currentPos = 1;
         const main = document.getElementById('main');
         const drawer = document.getElementById('intakeDrawer');
@@ -134,13 +145,10 @@
         const foodInput = document.getElementById('foodInput');
         const tagArea = document.getElementById('tagArea');
 
-        // 更新容器位置
-        function updateUI() {
-            main.style.transform = `translateY(-${currentPos * 100}vh)`;
-            bg.style.filter = `blur(${currentPos === 2 ? 45 : 25}px) brightness(${currentPos === 2 ? 0.5 : 0.7})`;
-        }
+        // 基础交互逻辑
+        window.openIntake = () => drawer.classList.add('open');
+        window.closeDrawer = () => drawer.classList.remove('open');
 
-        // 触摸滑动逻辑
         let startY;
         window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
         window.addEventListener('touchend', e => {
@@ -149,83 +157,75 @@
             if (Math.abs(deltaY) > 70) {
                 if (deltaY > 0 && currentPos > 0) currentPos--;
                 else if (deltaY < 0 && currentPos < 2) currentPos++;
-                updateUI();
+                main.style.transform = `translateY(-${currentPos * 100}vh)`;
+                bg.style.filter = `blur(${currentPos === 2 ? 45 : 25}px) brightness(${currentPos === 2 ? 0.5 : 0.7})`;
             }
         });
 
-        // 抽屉开关
-        function openIntake() { drawer.classList.add('open'); }
-        function closeDrawer() { drawer.classList.remove('open'); }
+        // 核心：Gemini 视觉解析函数
+        async function analyzeImage(base64String) {
+            tagArea.innerHTML = '<span class="animate-pulse text-xs text-orange-600 font-bold">🧪 正在连接 Balance Lab AI 核心...</span>';
+            foodInput.value = "正在读取图像特征...";
 
-        // 文件处理
-        function handleFile(input) {
-            if (input.files && input.files[0]) {
-                foodInput.value = `[图像样本加载成功]: ${input.files[0].name}\n正在提取营养参数...`;
-                tagArea.innerHTML = '<span class="px-4 py-2 bg-green-50 rounded-full border border-dashed border-green-600 text-xs text-green-700 font-bold">📸 图像采样就绪</span>';
+            try {
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const prompt = "你是一位专业的营养师。请识别这张图片中的食物。返回格式：第一行食物名称，第二行预估热量(kcal)，第三行简单的营养建议（20字以内）。";
+
+                const result = await model.generateContent([
+                    prompt,
+                    { inlineData: { data: base64String.split(",")[1], mimeType: "image/jpeg" } }
+                ]);
+
+                const text = result.response.text();
+                foodInput.value = text;
+                
+                // 解析出第一行作为标签
+                const firstLine = text.split('\n')[0];
+                tagArea.innerHTML = `<span class="food-tag">✅ ${firstLine}</span><span class="food-tag">🔥 解析成功</span>`;
+            } catch (error) {
+                console.error(error);
+                tagArea.innerHTML = '<span class="text-xs text-red-500">❌ AI 连接超时，请检查 API Key 权限</span>';
             }
         }
 
-        // 核心：真实语音识别逻辑
-        function startRealVoice() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("该浏览器不支持语音 API，请使用 Chrome 或 Safari。");
-                return;
-            }
+        // 文件监听
+        const fileToClick = (id) => document.getElementById(id).click();
+        document.getElementById('btnCamera').onclick = () => fileToClick('cameraInput');
+        document.getElementById('btnAlbum').onclick = () => fileToClick('albumInput');
 
-            const recognition = new SpeechRecognition();
+        const fileHandler = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => analyzeImage(evt.target.result);
+            reader.readAsDataURL(file);
+        };
+        document.getElementById('cameraInput').onchange = fileHandler;
+        document.getElementById('albumInput').onchange = fileHandler;
+
+        // 语音逻辑
+        window.startRealVoice = () => {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'zh-CN';
-            const voiceIcon = document.getElementById('voiceIcon');
-
-            recognition.onstart = () => {
-                voiceIcon.innerHTML = "🔴";
-                foodInput.placeholder = "正在实时转录...";
-                foodInput.value = "";
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                foodInput.value = transcript;
-                tagArea.innerHTML = `<span class="px-4 py-2 bg-blue-50 rounded-full border border-dashed border-blue-600 text-xs text-blue-700 font-bold">🎙️ 识别: "${transcript.substring(0,6)}..."</span>`;
-            };
-
-            recognition.onerror = (event) => {
-                voiceIcon.innerHTML = "🎙️";
-                alert("语音采样中断，请检查麦克风权限。");
-            };
-
-            recognition.onend = () => {
-                voiceIcon.innerHTML = "🎙️";
-            };
-
+            const vIcon = document.getElementById('voiceIcon');
+            recognition.onstart = () => { vIcon.innerHTML = "🔴"; foodInput.value = ""; };
+            recognition.onresult = (e) => { foodInput.value = e.results[0][0].transcript; };
+            recognition.onend = () => vIcon.innerHTML = "🎙️";
             recognition.start();
-        }
+        };
 
-        function confirmIntake() {
-            const btn = event.currentTarget;
-            btn.innerText = "数据同步成功 ✅";
-            btn.style.backgroundColor = "#4CAF50";
-            setTimeout(() => {
-                closeDrawer();
-                btn.innerText = "同步至实验室麻绳";
-                btn.style.backgroundColor = "black";
-            }, 1000);
-        }
+        window.confirmIntake = () => {
+            const b = event.currentTarget;
+            b.innerText = "数据已同步 ✅"; b.style.backgroundColor = "#4CAF50";
+            setTimeout(() => { closeDrawer(); b.innerText = "挂载至实验麻绳"; b.style.backgroundColor = "black"; }, 1000);
+        };
 
-        function pullRope(el) {
-            el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translateY(280px) scale(3)";
-            el.style.zIndex = "1000";
-            setTimeout(() => { 
-                const updated = prompt("更新备注:", el.querySelector('p').innerText);
-                if(updated) el.querySelector('p').innerText = updated;
-                el.style.transform = "translateY(0) scale(1)";
-                el.style.zIndex = "1";
-            }, 800);
-        }
+        window.pullRope = (el) => {
+            el.style.transform = "translateY(280px) scale(3)"; el.style.zIndex = "1000";
+            setTimeout(() => { el.style.transform = "translateY(0) scale(1)"; el.style.zIndex = "1"; }, 2000);
+        };
 
-        // 初始化到中间主页
-        updateUI();
+        main.style.transform = "translateY(-100vh)";
     </script>
 </body>
 </html>
