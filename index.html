@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Balance Lab | 能量平衡实验室</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="importmap">
-      { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
-    </script>
     <style>
-        :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; --bg-blur: 25px; }
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center; background-size: cover; filter: blur(var(--bg-blur)) brightness(0.7); z-index: -1; }
+        :root { --sage-green: #B2AC88; --dusty-blue: #96ADBD; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1a1a; font-family: 'PingFang SC', sans-serif; }
+        .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=1000') no-repeat center center; background-size: cover; filter: blur(25px) brightness(0.7); z-index: -1; }
         .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: 9999; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; }
         .drawer.open { bottom: 0; }
         .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 24px; }
@@ -19,12 +16,8 @@
         .analyze-btn { background: #3b82f6; color: white; padding: 14px; border-radius: 18px; font-weight: 800; width: 100%; margin: 15px 0; cursor: pointer; }
         .main-container { height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .control-panel { display: flex; gap: 40px; margin-top: 60px; }
-        .btn-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .btn-plus { background: var(--sage-green); }
-        .btn-minus { background: var(--dusty-blue); }
         .rope-container { width: 100%; height: 3px; background: #6b5344; position: absolute; top: 50%; }
-        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .polaroid { width: 85px; height: 110px; background: white; padding: 6px; position: absolute; top: -120px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: 0.5s; }
         #cameraInput, #albumInput { display: none; }
     </style>
 </head>
@@ -39,23 +32,24 @@
             <div onclick="document.getElementById('albumInput').click()" class="flex flex-col items-center gap-2"><div class="action-icon">🖼️</div><span class="text-[10px] text-gray-400">相册</span></div>
             <div onclick="toggleVoice()" class="flex flex-col items-center gap-2"><div class="action-icon" id="voiceIcon">🎙️</div><span class="text-[10px] text-gray-400">语音</span></div>
         </div>
-        <textarea class="input-area" id="foodInput" placeholder="输入饮食内容..."></textarea>
+        <textarea class="input-area" id="foodInput" placeholder="输入采样数据..."></textarea>
         <button class="analyze-btn" id="analyzeBtn" onclick="triggerAIAnalysis()">🔥 热量分析</button>
-        <div id="tagArea" class="flex flex-wrap justify-center mb-4 min-h-[30px]"></div>
+        <div id="tagArea" class="flex flex-wrap justify-center mb-4 min-h-[30px] text-center"></div>
         <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold opacity-30" onclick="confirmIntake()" disabled>同步至麻绳</button>
-        <p class="text-[10px] text-center mt-4 text-gray-400 underline" onclick="resetKey()">[ 重置 API Key ]</p>
+        <p class="text-[10px] text-center mt-4 text-gray-400 underline" onclick="resetKey()">[ 重置 API KEY ]</p>
     </div>
 
     <div class="main-container" id="main">
         <div class="section"><div class="rope-container" id="ropeContainer"></div></div>
         <div class="section">
-            <div class="bg-white/10 backdrop-blur-lg p-6 rounded-3xl border border-white/20 text-center">
+            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/20 text-center">
                 <h2 class="text-white text-3xl font-light tracking-[0.3em]">LAB.TODAY</h2>
-                <p class="text-white/60 text-[10px] mt-2 uppercase">Akron • 2026</p>
+                <p class="text-white/60 text-[10px] mt-2 uppercase">Akron, Ohio • 2026</p>
             </div>
-            <div class="control-panel">
-                <div class="btn-circle btn-plus" onclick="openIntake()"><span class="text-3xl">+</span><span class="text-[10px] uppercase">Intake</span></div>
-                <div class="btn-circle btn-minus" onclick="alert('Burn模块构建中')"><span class="text-3xl">−</span><span class="text-[10px] uppercase">Burn</span></div>
+            <div class="flex gap-10 mt-12">
+                <div class="w-24 h-24 rounded-full bg-[#B2AC88] flex flex-col items-center justify-center text-white shadow-xl" onclick="openIntake()">
+                    <span class="text-3xl">+</span><span class="text-[10px] font-bold uppercase">Intake</span>
+                </div>
             </div>
         </div>
         <div class="section"></div>
@@ -64,15 +58,14 @@
     <input type="file" id="cameraInput" accept="image/*" capture="camera">
     <input type="file" id="albumInput" accept="image/*">
 
-    <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
-
+    <script>
+        // 1. 安全授权重置
         window.resetKey = () => { localStorage.removeItem('GEMINI_LAB_KEY'); location.reload(); };
 
         function getSafeKey() {
             let key = localStorage.getItem('GEMINI_LAB_KEY');
             if (!key) {
-                key = prompt("请输入有效的 Gemini API Key");
+                key = prompt("请输入您的 Gemini API Key");
                 if (key) localStorage.setItem('GEMINI_LAB_KEY', key.trim());
             }
             return key;
@@ -88,6 +81,7 @@
         window.openIntake = () => drawer.classList.add('open');
         window.closeDrawer = () => drawer.classList.remove('open');
 
+        // 滑动控制
         let startY;
         window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
         window.addEventListener('touchend', e => {
@@ -100,36 +94,51 @@
             }
         });
 
-        // 核心 AI 逻辑：使用 gemini-pro 确保兼容性
+        // 2. 核心：改用原生 Fetch API (绕过 SDK 路径错误)
         window.triggerAIAnalysis = async () => {
             const KEY = getSafeKey();
             if(!KEY) return;
-            analyzeBtn.innerText = "⚡ 正在建立连接...";
+            analyzeBtn.innerText = "⚡ 正在解析物理数据...";
+            tagArea.innerHTML = '<span class="text-xs text-blue-500 animate-pulse">正在发送 REST 请求...</span>';
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`;
             
+            const payload = {
+                contents: [{
+                    parts: [{ text: `你是一个营养学专家。请分析以下食物：${foodInput.value}。请按严格格式回答：第一行食物名，第二行卡路里数字，第三行建议。` }]
+                }]
+            };
+
             try {
-                const genAI = new GoogleGenerativeAI(KEY);
-                // 修改点：切换为 gemini-pro，这是 v1beta 路径下最稳定的文本模型
-                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
                 
-                const prompt = "你是一个营养专家。请分析以下食物并严格按此格式返回：第一行食物名，第二行卡路里数字（仅数字），第三行一句建议。内容如下：";
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                const aiText = data.candidates[0].content.parts[0].text;
+                const lines = aiText.split('\n').filter(l => l.trim() !== "");
                 
-                const result = await model.generateContent(prompt + foodInput.value);
-                const response = await result.response;
-                const text = response.text();
-                
-                const lines = text.split('\n').filter(l => l.trim() !== "");
+                foodInput.value = aiText;
                 tagArea.innerHTML = `<span class="px-3 py-1 bg-green-100 rounded-full text-xs font-bold text-green-700">${lines[0]} | ${lines[1]} kcal</span>`;
-                foodInput.value = text;
+                
                 document.getElementById('confirmBtn').disabled = false;
                 document.getElementById('confirmBtn').classList.remove('opacity-30');
-                analyzeBtn.innerText = "🔥 分析成功";
+                analyzeBtn.innerText = "🔥 解析成功";
             } catch (err) {
                 console.error(err);
-                foodInput.value = `[DEBUG ERROR]\n${err.message}\n\n提示：尝试换成纯文字录入测试。`;
+                foodInput.value = `❌ 实验故障：\n${err.message}\n\n请确认：1. 全局梯子是否在线 2. API Key 是否有效`;
                 analyzeBtn.innerText = "🔥 重试分析";
             }
         };
 
+        // 3. 语音功能
         let recognition;
         window.toggleVoice = () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -141,12 +150,27 @@
             recognition.start();
         };
 
+        // 4. 图片逻辑
+        document.getElementById('cameraInput').onchange = (e) => {
+            foodInput.value = "[图像样本已挂载，请点击分析]";
+            tagArea.innerHTML = "📸 图片就绪";
+        };
+
+        // 5. 同步至麻绳
         window.confirmIntake = () => {
             const card = document.createElement('div');
             card.className = 'polaroid';
             card.style.left = `${Math.random()*60+10}%`;
-            card.innerHTML = `<div class='h-16 bg-gray-100 flex items-center justify-center text-xl'>🥗</div><p class='text-[8px] text-center mt-1'>${foodInput.value.split('\n')[0]}</p>`;
+            card.innerHTML = `<div class='h-16 bg-gray-50 flex items-center justify-center text-xl'>🥗</div><p class='text-[8px] text-center mt-1 font-bold'>${foodInput.value.split('\n')[0]}</p>`;
             document.getElementById('ropeContainer').appendChild(card);
+            
+            // 点击可拉近观察
+            card.onclick = function() {
+                this.style.transform = "translateY(280px) scale(3)";
+                this.style.zIndex = "100";
+                setTimeout(() => { this.style.transform = "translateY(0) scale(1)"; this.style.zIndex = "1"; }, 2000);
+            };
+            
             closeDrawer();
         };
 
