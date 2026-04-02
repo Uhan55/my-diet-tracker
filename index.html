@@ -20,15 +20,14 @@
         .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
         .action-icon { width: 55px; height: 55px; border-radius: 18px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; font-size: 24px; transition: 0.3s; }
         
-        /* 录音状态 */
         .recording .action-icon { background: #fee2e2; color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         .input-area { width: 100%; height: 110px; border: 1.5px solid #eee; background: #fafafa; border-radius: 20px; padding: 15px; font-size: 15px; outline: none; resize: none; line-height: 1.6; }
         
-        /* 传送按钮 */
-        .analyze-btn { background: #3b82f6; color: white; padding: 12px; border-radius: 15px; font-weight: bold; font-size: 13px; margin: 15px 0; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
-        .analyze-btn:active { transform: scale(0.98); opacity: 0.9; }
+        /* 改版后的热量分析按钮 */
+        .analyze-btn { background: #3b82f6; color: white; padding: 14px; border-radius: 18px; font-weight: 800; font-size: 14px; margin: 15px 0; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); }
+        .analyze-btn:active { transform: scale(0.96); opacity: 0.9; }
 
         .main-container { height: 300vh; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .section { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -43,7 +42,7 @@
         @keyframes swing { 0%, 100% { transform: rotate(2deg); } 50% { transform: rotate(-2deg); } }
         
         #cameraInput, #albumInput { display: none; }
-        .food-tag { display: inline-block; padding: 5px 10px; background: #f0f0f0; border-radius: 12px; margin: 3px; font-size: 11px; border: 1px dashed #ccc; font-weight: bold; }
+        .food-tag { display: inline-block; padding: 5px 12px; background: #f0f0f0; border-radius: 12px; margin: 3px; font-size: 11px; border: 1px dashed #ccc; font-weight: bold; color: #444; }
     </style>
 </head>
 <body>
@@ -52,7 +51,7 @@
 
     <div class="drawer" id="intakeDrawer">
         <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 cursor-pointer" onclick="closeDrawer()"></div>
-        <h3 class="text-base font-bold mb-4 text-center text-gray-700 uppercase tracking-widest">Data Intake Center</h3>
+        <h3 class="text-base font-bold mb-4 text-center text-gray-700 tracking-[0.2em] uppercase">Data Intake</h3>
         
         <input type="file" id="cameraInput" accept="image/*" capture="camera">
         <input type="file" id="albumInput" accept="image/*">
@@ -69,15 +68,15 @@
             </div>
         </div>
         
-        <textarea class="input-area shadow-inner" id="foodInput" placeholder="输入或语音录入采样数据..."></textarea>
+        <textarea class="input-area shadow-sm" id="foodInput" placeholder="输入采样数据..."></textarea>
         
-        <button class="analyze-btn" onclick="triggerAIAnalysis()">
-            <span>🚀 传送至 Gemini 实验室解析</span>
+        <button class="analyze-btn" id="analyzeBtn" onclick="triggerAIAnalysis()">
+            <span>🔥 热量分析</span>
         </button>
 
         <div id="tagArea" class="flex flex-wrap justify-center mb-4 overflow-y-auto max-h-20"></div>
         
-        <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all opacity-50 cursor-not-allowed" onclick="confirmIntake()" disabled>
+        <button id="confirmBtn" class="w-full py-4 bg-black text-white rounded-2xl font-bold active:scale-95 transition-all opacity-40 cursor-not-allowed" onclick="confirmIntake()" disabled>
             同步至实验室麻绳
         </button>
     </div>
@@ -85,7 +84,7 @@
     <div class="main-container" id="main">
         <div class="section">
             <div class="rope-container" id="ropeContainer"></div>
-            <div class="absolute bottom-10 text-white opacity-40 text-[10px] tracking-[0.3em] uppercase">Laboratory Footprints</div>
+            <div class="absolute bottom-10 text-white opacity-40 text-[10px] tracking-[0.3em] uppercase">Laboratory Timeline</div>
         </div>
         <div class="section">
             <div class="date-card">
@@ -93,15 +92,13 @@
                 <p class="text-white/60 text-[10px] mt-2 uppercase tracking-widest">Akron • April 2, 2026</p>
             </div>
             <div class="control-panel">
-                <div class="btn-circle btn-plus" onclick="openIntake()"><span class="text-4xl">+</span><span class="text-[10px] mt-2 font-bold uppercase">Intake</span></div>
-                <div class="btn-circle btn-minus" onclick="alert('即将开启消耗录入')"><span class="text-4xl">−</span><span class="text-[10px] mt-2 font-bold uppercase">Burn</span></div>
+                <div class="btn-circle btn-plus" onclick="openIntake()"><span class="text-4xl">+</span><span class="text-[10px] mt-2 font-bold uppercase tracking-widest">Intake</span></div>
+                <div class="btn-circle btn-minus" onclick="alert('消耗录入建设中')"><span class="text-4xl">−</span><span class="text-[10px] mt-2 font-bold uppercase tracking-widest">Burn</span></div>
             </div>
         </div>
         <div class="section">
             <div class="w-[88%] h-[60%] bg-white/95 rounded-[35px] p-8 shadow-2xl flex flex-col items-center justify-center">
-                <h3 class="font-bold text-gray-400 text-xs tracking-[0.4em] uppercase mb-10">Data Analysis Card</h3>
-                <div class="w-full h-px bg-gray-100 mb-10"></div>
-                <p class="text-gray-300 text-[10px]">实验室看板建设中...</p>
+                <p class="text-gray-300 text-[10px] tracking-[0.4em] uppercase">Data Analysis</p>
             </div>
         </div>
     </div>
@@ -116,7 +113,7 @@
         let currentPos = 1;
         let isRecording = false;
         let recognition = null;
-        let lastImageData = null; // 存储待上传的图片
+        let lastImageData = null;
 
         const main = document.getElementById('main');
         const drawer = document.getElementById('intakeDrawer');
@@ -125,6 +122,7 @@
         const tagArea = document.getElementById('tagArea');
         const ropeContainer = document.getElementById('ropeContainer');
         const confirmBtn = document.getElementById('confirmBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
 
         window.openIntake = () => drawer.classList.add('open');
         window.closeDrawer = () => drawer.classList.remove('open');
@@ -143,46 +141,52 @@
             }
         });
 
-        // 核心：点击按钮触发 AI 解析
+        // 核心 AI 分析
         window.triggerAIAnalysis = async () => {
             const content = foodInput.value.trim();
-            if (!content && !lastImageData) return alert("请先录入语音、文字或图片数据");
+            if (!content && !lastImageData) return alert("请先采样数据");
 
-            tagArea.innerHTML = '<span class="animate-pulse text-xs text-blue-600 font-bold tracking-tighter">🚀 正在将数据传送至云端实验室...</span>';
+            analyzeBtn.innerHTML = "⚡ 正在计算热量...";
+            analyzeBtn.style.background = "#94a3b8";
+            tagArea.innerHTML = '<span class="animate-pulse text-xs text-blue-600 font-bold">🧪 正在连接 Balance Lab AI 核心...</span>';
             
             try {
-                const prompt = "你是一位资深营养师。请分析该食物。第一行：食物名；第二行：热量(仅数字)；第三行：简短建议。";
+                const prompt = "你是一位资深营养师。分析该食物。第一行：名称；第二行：热量(仅数字)；第三行：一句营养建议。";
                 let result;
                 
                 if (lastImageData) {
-                    // 如果有图片，优先解析图片
                     result = await model.generateContent([prompt, { inlineData: { data: lastImageData.split(",")[1], mimeType: "image/jpeg" } }]);
                 } else {
-                    // 解析文字/语音
                     result = await model.generateContent([prompt, content]);
                 }
 
-                const text = await result.response.text();
+                const response = await result.response;
+                const text = response.text();
                 foodInput.value = text;
                 const lines = text.split('\n').filter(l => l.trim() !== "");
                 
                 tagArea.innerHTML = `<span class="food-tag">✅ ${lines[0]}</span><span class="food-tag">🔥 ${lines[1]} kcal</span>`;
                 
-                // 激活同步按钮
                 confirmBtn.dataset.latest = `${lines[0]}|${lines[1]}`;
                 confirmBtn.disabled = false;
-                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                confirmBtn.classList.remove('opacity-40', 'cursor-not-allowed');
                 
-                lastImageData = null; // 解析完清空图片缓存
+                analyzeBtn.innerHTML = "🔥 热量分析完成";
+                analyzeBtn.style.background = "#10b981"; 
+                lastImageData = null; 
             } catch (err) {
-                tagArea.innerHTML = '<span class="text-xs text-red-500">❌ 传送失败，请检查实验室连接</span>';
+                console.error(err);
+                analyzeBtn.innerHTML = "🔥 热量分析";
+                analyzeBtn.style.background = "#3b82f6";
+                tagArea.innerHTML = `<span class="text-[10px] text-red-500 font-bold">❌ 传送失败：请检查网络或API限流</span>`;
+                foodInput.value += "\n\n[ERROR]: " + err.message;
             }
         };
 
-        // 语音逻辑（仅录音，不自动触发分析）
+        // 语音逻辑
         window.toggleVoice = () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert("浏览器不支持");
+            if (!SpeechRecognition) return alert("当前环境不支持语音接口");
 
             const iconBtn = document.getElementById('voiceToggleBtn');
             const icon = document.getElementById('voiceIcon');
@@ -195,7 +199,7 @@
                     isRecording = true;
                     iconBtn.classList.add('recording');
                     icon.innerHTML = "🔴";
-                    foodInput.placeholder = "正在录入采样，再次点击停止...";
+                    foodInput.placeholder = "聆听采样中，点击停止...";
                 };
                 recognition.onresult = (e) => {
                     const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
@@ -207,26 +211,26 @@
                 isRecording = false;
                 iconBtn.classList.remove('recording');
                 icon.innerHTML = "🎙️";
-                foodInput.placeholder = "语音录入已完成，请点击下方解析按钮";
+                foodInput.placeholder = "录入已完成，请点击热量分析";
             }
         };
 
-        // 图片监听
+        // 图片处理
         const fileHandler = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (evt) => {
                 lastImageData = evt.target.result;
-                foodInput.value = `[图像样本已就绪]: ${file.name}\n请点击下方按钮启动 AI 解析`;
-                tagArea.innerHTML = '<span class="food-tag">📸 待解析图片</span>';
+                foodInput.value = `[图像样本已挂载]: ${file.name}\n请启动热量分析`;
+                tagArea.innerHTML = '<span class="food-tag">📸 待分析图片样本</span>';
             };
             reader.readAsDataURL(file);
         };
         document.getElementById('cameraInput').onchange = fileHandler;
         document.getElementById('albumInput').onchange = fileHandler;
 
-        // 同步挂载逻辑
+        // 同步麻绳
         window.confirmIntake = () => {
             const data = confirmBtn.dataset.latest;
             const [name, cals] = data.split('|');
@@ -245,14 +249,16 @@
             };
             ropeContainer.appendChild(card);
             
-            confirmBtn.innerText = "已挂载至麻绳 ✅"; 
-            confirmBtn.style.backgroundColor = "#4CAF50";
+            confirmBtn.innerText = "已收录 ✅"; 
+            confirmBtn.style.backgroundColor = "#10b981";
             setTimeout(() => { 
                 closeDrawer(); 
                 confirmBtn.innerText = "同步至实验室麻绳"; 
                 confirmBtn.style.backgroundColor = "black";
                 confirmBtn.disabled = true;
-                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                confirmBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                analyzeBtn.innerHTML = "🔥 热量分析";
+                analyzeBtn.style.background = "#3b82f6";
                 tagArea.innerHTML = "";
                 foodInput.value = "";
             }, 1000);
